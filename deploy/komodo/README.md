@@ -7,6 +7,8 @@ Komodo stack `open-seo` runs on server `svc-docker`, tracking `main` and
 `deploy/komodo/compose.yaml`. It uses the upstream standalone stack, with an
 immutable OpenSEO image digest, Cloudflare Tunnel ingress and bounded logs.
 The init container exits successfully after applying migrations; this is expected.
+Set Komodo stack `ignore_services` to `["init"]` so this successful one-time
+container does not cause the stack to report unhealthy. It still runs on deploy.
 
 ## Access and first account
 
