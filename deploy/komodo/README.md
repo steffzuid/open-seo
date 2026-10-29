@@ -5,21 +5,17 @@ Upstream: https://github.com/every-app/open-seo
 
 Komodo stack `open-seo` runs on server `svc-docker`, tracking `main` and
 `deploy/komodo/compose.yaml`. It uses the upstream standalone stack, with an
-immutable OpenSEO image digest, private loopback access and bounded logs.
+immutable OpenSEO image digest, Cloudflare Tunnel ingress and bounded logs.
 The init container exits successfully after applying migrations; this is expected.
 
 ## Access and first account
 
-From your computer, open a tunnel (use your SSH username):
-
-```sh
-ssh -N -L 3001:127.0.0.1:3001 USER@100.68.88.96
-```
-
-Open http://localhost:3001 and create the first administrator account.
-Registration closes after the first account. The app is bound only to the
-server loopback address; no public ingress or DNS is needed.
-`BETTER_AUTH_URL=http://localhost:3001` must match the address used in the browser.
+Open https://seo.zuidema.co through Cloudflare Tunnel and Cloudflare Access.
+Create the administrator account on your first visit. Registration closes after
+the first account. The hostname must have an Access policy before DNS is created.
+Traefik routes the hostname to web on port 80; backend storage and runtime have
+no host ports. A loopback-only port 3001 is retained for health checks.
+`BETTER_AUTH_URL=https://seo.zuidema.co` must match the browser address.
 
 ## Configuration
 
@@ -50,6 +46,4 @@ image updates are disabled. Migrations run during init; rollback requires the
 matching pre-update backup rather than only switching the image.
 
 Check `curl --fail http://127.0.0.1:3001/api/health` on svc-docker and inspect
-init/runtime logs in Komodo after deployment. For public HTTPS later, create the
-administrator first, set BETTER_AUTH_URL to the HTTPS hostname, add reverse
-proxy routing and the corresponding tunnel/Access policy, then recreate services.
+init/runtime logs in Komodo after deployment.

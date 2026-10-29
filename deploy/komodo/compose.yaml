@@ -90,7 +90,7 @@ services:
       AWS_ACCESS_KEY_ID: ${STORAGE_ACCESS_KEY:?Set STORAGE_ACCESS_KEY in .env}
       AWS_SECRET_ACCESS_KEY: ${STORAGE_SECRET_KEY:?Set STORAGE_SECRET_KEY in .env}
       AUTH_MODE: ${AUTH_MODE:-password}
-      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3001}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-https://seo.zuidema.co}
       CONTEXT_API_KEY: ${CONTEXT_API_KEY:-}
       DATAFORSEO_API_KEY: ${DATAFORSEO_API_KEY:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
@@ -153,7 +153,11 @@ services:
         condition: service_started
     restart: unless-stopped
     labels:
-      traefik.enable: 'false'
+      traefik.enable: 'true'
+      traefik.docker.network: traefik-proxy
+      traefik.http.routers.open-seo.rule: Host(`seo.zuidema.co`)
+      traefik.http.routers.open-seo.entrypoints: web
+      traefik.http.services.open-seo.loadbalancer.server.port: '80'
       komodo.skip: ''
     security_opt:
     - no-new-privileges:true
@@ -162,8 +166,15 @@ services:
       options:
         max-size: 10m
         max-file: '3'
+    networks:
+    - default
+    - traefik-proxy
 volumes:
   storage: null
   runtime: null
   config: null
   web-config: null
+networks:
+  traefik-proxy:
+    external: true
+    name: traefik-proxy
